@@ -11,6 +11,7 @@ import os, json, glob, argparse
 from pathlib import Path
 from typing import List, Tuple, Dict
 import numpy as np
+from sentence_transformers import SentenceTransformer
 
 # Global constants
 DATA_DIR = Path("data_policies")  # Directory containing policy PDFs and TXT files
@@ -197,7 +198,7 @@ def build(chunk_size=800, overlap=200):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Build FAISS index from PDFs/TXTs")
-    parser.add_argument("--chunk-size", type=int, default=800, help="Chunk size for text splitting")
-    parser.add_argument("--overlap", type=int, default=200, help="Overlap for chunking")
+    parser.add_argument("--chunk-size", type=int, default=100, help="Chunk size for text splitting")
+    parser.add_argument("--overlap", type=int, default=30, help="Overlap for chunking")
     args = parser.parse_args()
     build(chunk_size=args.chunk_size, overlap=args.overlap)

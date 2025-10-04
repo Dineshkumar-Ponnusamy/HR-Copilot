@@ -11,6 +11,7 @@ from sentence_transformers import SentenceTransformer
 from groq import Groq
 from prompts import SYSTEM_PROMPT
 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"  # Disable parallelism warning
 INDEX_DIR = Path("index")
 LOGS_DIR = Path("logs"); LOGS_DIR.mkdir(parents=True, exist_ok=True)
 ROLES_PATH = Path("roles.json")

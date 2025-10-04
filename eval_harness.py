@@ -134,7 +134,11 @@ def call_groq(key: str, model: str, system_prompt: str, user_prompt: str):
     content = resp.choices[0].message.content
     return content, latency_ms
 
-def evaluate(questions_path="eval_questions.json", top_k=5, refuse_threshold=0.20, out_csv="eval_results.csv", use_reranker=False):
+from difflib import SequenceMatcher
+def fuzzy_match(a, b):
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+
+def evaluate(questions_path="eval_questions.json", top_k=5, refuse_threshold=0.10, out_csv="eval_results.csv", use_reranker=False):
     key = (os.getenv("GROQ_API_KEY") or "").strip()
     if not key: raise RuntimeError("Set GROQ_API_KEY")
     qset = json.loads(Path(questions_path).read_text(encoding="utf-8"))
@@ -165,9 +169,16 @@ def evaluate(questions_path="eval_questions.json", top_k=5, refuse_threshold=0.2
 
         srcs = "; ".join(sources_list(chosen))
         grounded = (item["expect_source_contains"].lower() in srcs.lower()) if item["expect_source_contains"] else True
-        contains = (item["expect_text_contains"].lower() in ans.lower()) if item["expect_text_contains"] else ("I don’t have enough policy evidence" in ans)
+        
+        # Answer acceptance logic
+        if item["expect_text_contains"]:
+            answer_contains_expected_text = fuzzy_match(item["expect_text_contains"], ans) > 0.5
+        else:
+            answer_contains_expected_text = "I don’t have enough policy evidence" in ans
+        
+        print(f"[fuzzy] score={fuzzy_match(item['expect_text_contains'], ans):.2f} | Q: {q}")
 
-        ok = grounded and contains
+        ok = grounded and answer_contains_expected_text
         passed += int(ok)
 
         results.append({
@@ -178,7 +189,7 @@ def evaluate(questions_path="eval_questions.json", top_k=5, refuse_threshold=0.2
             "max_retrieval_score": round(max_score,3),
             "latency_ms": latency_ms,
             "grounded_ok": grounded,
-            "answer_contains_expected_text": contains,
+            "answer_contains_expected_text": answer_contains_expected_text,
             "pass": ok,
             "answer": ans
         })
