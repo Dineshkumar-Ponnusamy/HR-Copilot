@@ -1,0 +1,29 @@
+question,expected_source_contains,expected_text_contains,sources,max_retrieval_score,latency_ms,grounded_ok,answer_contains_expected_text,pass,answer
+How many sick leave days do employees get each year?,Leave_Policy,Sick leave: 10 days,Leave_Policy.pdf (p.1); Leave_Policy.pdf (p.2); Code_of_Conduct.pdf (p.2); Travel_Expense_Policy.pdf (p.1); Code_of_Conduct.pdf (p.1),0.76,714,True,False,False,"According to the Leave Policy, employees receive 10 days of paid sick leave per calendar year. 
+
+Source: [Leave_Policy.pdf p.1]"
+What is the annual leave carryover limit?,Leave_Policy,Carryover limit: 5 days,Leave_Policy.pdf (p.1); Travel_Expense_Policy.pdf (p.2); Travel_Expense_Policy.pdf (p.1); Leave_Policy.pdf (p.2); Code_of_Conduct.pdf (p.1),0.623,719,True,False,False,"The annual leave carryover limit is 5 days to the next year. 
+
+[Source: Leave_Policy.pdf p.1]"
+Are contractors eligible for parental leave?,Leave_Policy,Contractors are not eligible,Leave_Policy.pdf (p.2); Leave_Policy.pdf (p.1); Code_of_Conduct.pdf (p.1); Travel_Expense_Policy.pdf (p.2); Travel_Expense_Policy.pdf (p.1),0.879,530,True,True,True,"Contractors are not eligible for parental leave. 
+
+[Leave_Policy.pdf p.2]"
+Are Uber/Lyft rides allowed for business travel?,Travel_Expense_Policy,Uber/Lyft allowed,Travel_Expense_Policy.pdf (p.1); Travel_Expense_Policy.pdf (p.2); Code_of_Conduct.pdf (p.1); Leave_Policy.pdf (p.2); Leave_Policy.pdf (p.1),0.612,524,True,False,False,"Yes, Uber/Lyft rides are allowed for business travel. 
+
+[Travel_Expense_Policy.pdf p.1]"
+What is the daily meal reimbursement limit?,Travel_Expense_Policy,$60/day,Travel_Expense_Policy.pdf (p.1); Leave_Policy.pdf (p.1); Leave_Policy.pdf (p.2); Travel_Expense_Policy.pdf (p.2); Code_of_Conduct.pdf (p.1),0.49,659,True,True,True,"The daily meal reimbursement limit is $60/day. 
+
+Source: [Travel_Expense_Policy.pdf p.1]"
+Do I need receipts for small expenses?,Travel_Expense_Policy,Receipts required for expenses over $25,Travel_Expense_Policy.pdf (p.1); Travel_Expense_Policy.pdf (p.2); Leave_Policy.pdf (p.1); Leave_Policy.pdf (p.2); Code_of_Conduct.pdf (p.2),0.472,527,True,False,False,"According to the Travel_Expense_Policy, receipts are required for expenses over $25. 
+
+Source: [Travel_Expense_Policy.pdf p.1]"
+How soon must I report a misconduct incident?,Code_of_Conduct,within 5 business days,Code_of_Conduct.pdf (p.2); Code_of_Conduct.pdf (p.1); Leave_Policy.pdf (p.1); Travel_Expense_Policy.pdf (p.2); Leave_Policy.pdf (p.2),0.61,426,True,True,True,"You must report a misconduct incident to HR within 5 business days. 
+
+[Code_of_Conduct.pdf p.2]"
+Is harassment allowed?,Code_of_Conduct,strictly prohibited,Code_of_Conduct.pdf (p.1); Code_of_Conduct.pdf (p.2); Leave_Policy.pdf (p.2); Leave_Policy.pdf (p.1); Travel_Expense_Policy.pdf (p.1),0.682,510,True,True,True,"No, harassment is not allowed. 
+
+According to the Code of Conduct (p.1), ""Harassment is strictly prohibited."""
+What’s the anonymous hotline availability?,Code_of_Conduct,Anonymous hotline is available,Code_of_Conduct.pdf (p.2); Travel_Expense_Policy.pdf (p.1); Leave_Policy.pdf (p.2); Code_of_Conduct.pdf (p.1); Travel_Expense_Policy.pdf (p.2),0.343,435,True,True,True,"The anonymous hotline is available for reporting incidents. 
+
+[Source: Code_of_Conduct.pdf p.2]"
+"If the answer isn’t in policy, how should the bot respond?",,I don’t have enough policy evidence,Code_of_Conduct.pdf (p.1); Code_of_Conduct.pdf (p.2); Travel_Expense_Policy.pdf (p.2); Leave_Policy.pdf (p.2); Leave_Policy.pdf (p.1),0.158,0,True,True,True,I don’t have enough policy evidence to answer. Please check with HR.

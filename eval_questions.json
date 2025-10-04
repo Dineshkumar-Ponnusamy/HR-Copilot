@@ -1,0 +1,52 @@
+[
+  {
+    "q": "How many sick leave days do employees get each year?",
+    "expect_source_contains": "Leave_Policy",
+    "expect_text_contains": "Sick leave: 10 days"
+  },
+  {
+    "q": "What is the annual leave carryover limit?",
+    "expect_source_contains": "Leave_Policy",
+    "expect_text_contains": "Carryover limit: 5 days"
+  },
+  {
+    "q": "Are contractors eligible for parental leave?",
+    "expect_source_contains": "Leave_Policy",
+    "expect_text_contains": "Contractors are not eligible"
+  },
+  {
+    "q": "Are Uber/Lyft rides allowed for business travel?",
+    "expect_source_contains": "Travel_Expense_Policy",
+    "expect_text_contains": "Uber/Lyft allowed"
+  },
+  {
+    "q": "What is the daily meal reimbursement limit?",
+    "expect_source_contains": "Travel_Expense_Policy",
+    "expect_text_contains": "$60/day"
+  },
+  {
+    "q": "Do I need receipts for small expenses?",
+    "expect_source_contains": "Travel_Expense_Policy",
+    "expect_text_contains": "Receipts required for expenses over $25"
+  },
+  {
+    "q": "How soon must I report a misconduct incident?",
+    "expect_source_contains": "Code_of_Conduct",
+    "expect_text_contains": "within 5 business days"
+  },
+  {
+    "q": "Is harassment allowed?",
+    "expect_source_contains": "Code_of_Conduct",
+    "expect_text_contains": "strictly prohibited"
+  },
+  {
+    "q": "What’s the anonymous hotline availability?",
+    "expect_source_contains": "Code_of_Conduct",
+    "expect_text_contains": "Anonymous hotline is available"
+  },
+  {
+    "q": "If the answer isn’t in policy, how should the bot respond?",
+    "expect_source_contains": "",
+    "expect_text_contains": "I don’t have enough policy evidence"
+  }
+]
