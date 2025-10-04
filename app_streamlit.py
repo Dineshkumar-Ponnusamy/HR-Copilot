@@ -9,6 +9,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from groq import Groq
+from prompts import SYSTEM_PROMPT
 
 INDEX_DIR = Path("index")
 LOGS_DIR = Path("logs"); LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -28,9 +29,20 @@ def l2_normalize(X: np.ndarray) -> np.ndarray:
 
 @st.cache_resource(show_spinner=False)
 def load_index():
-    embs = np.load(INDEX_DIR / "embeddings.npy")
-    texts = json.loads((INDEX_DIR / "texts.json").read_text(encoding="utf-8"))
-    meta  = json.loads((INDEX_DIR / "meta.json").read_text(encoding="utf-8"))
+    try:
+        embs = np.load(INDEX_DIR / "embeddings.npy")
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Embeddings file missing: {e}")
+
+    try:
+        texts = json.loads((INDEX_DIR / "texts.json").read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        raise FileNotFoundError(f"Texts index file missing or invalid: {e}")
+
+    try:
+        meta = json.loads((INDEX_DIR / "meta.json").read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        raise FileNotFoundError(f"Meta index file missing or invalid: {e}")
 
     # Only load FAISS if the file exists and is non-empty; otherwise fall back.
     index = None
@@ -96,13 +108,6 @@ def retrieve_with_role(emb_model, embs, texts, meta, query: str, role: str, want
                 break
     return chosen
 
-SYSTEM_PROMPT = (
-    "You are an HR Policy Assistant. Answer ONLY using the provided context. "
-    "If the answer is not clearly in the context, say: "
-    "\"I don’t have enough policy evidence to answer. Please check with HR.\" "
-    "Keep answers concise and practical."
-)
-
 def format_context(chosen: List[Dict]) -> str:
     blocks = []
     for c in chosen:
@@ -137,7 +142,7 @@ def log_event(row: Dict):
     with path.open("a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         if not file_exists:
-            writer.writerow(["ts","model","role","question","top_sources","scores","latency_ms"])
+            writer.writerow(["ts","model","role","question","top_sources","scores","latency_ms","input_tokens","output_tokens","total_tokens"])
         writer.writerow([
             int(time.time()),
             row["model"],
@@ -146,6 +151,9 @@ def log_event(row: Dict):
             row["sources"],
             row["scores"],
             row["latency_ms"],
+            row.get("input_tokens"),
+            row.get("output_tokens"),
+            row.get("total_tokens"),
         ])
 
 def main():
@@ -153,8 +161,18 @@ def main():
     st.title("HR Policy Copilot — Groq + FAISS (no LangChain)")
     st.caption("Role-aware retrieval + CSV logging. Answers cite local PDFs/TXTs.")
 
+    with st.sidebar:
+        st.header("Chat History")
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+        for msg in reversed(st.session_state.messages[-5:]):
+            with st.expander(f"Q: {msg['question'][:50]}..."):
+                st.write(msg["answer"])
+                st.write("Sources:", msg["sources"])
+
     groq_key = os.getenv("GROQ_API_KEY") or st.text_input("GROQ_API_KEY", type="password")
     if not groq_key:
+        st.warning("API key is stored in session state for the duration of the app session. For secure deployment, use environment variables.")
         st.info("Enter your GROQ_API_KEY.")
         st.stop()
 
@@ -189,16 +207,27 @@ def main():
 
         st.write(answer)
         st.markdown("**Sources:**")
-        for s in sources_list(chosen):
+        src_list = sources_list(chosen)
+        for s in src_list:
             st.write(f"- {s}")
+
+        # Append to history
+        st.session_state.messages.append({
+            "question": question,
+            "answer": answer,
+            "sources": src_list
+        })
 
         log_event({
             "model": model_choice,
             "role": role,
             "question": question,
-            "sources": "; ".join(sources_list(chosen)),
+            "sources": "; ".join(src_list),
             "scores": "; ".join([f"{s:.3f}" for s in scores]),
             "latency_ms": latency_ms,
+            "input_tokens": getattr(usage, 'input_tokens', None) if usage else None,
+            "output_tokens": getattr(usage, 'output_tokens', None) if usage else None,
+            "total_tokens": getattr(usage, 'total_tokens', None) if usage else None,
         })
 
         with st.expander("Debug (retrieval scores)"):
