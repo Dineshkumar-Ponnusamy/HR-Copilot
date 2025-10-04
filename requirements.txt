@@ -1,0 +1,13 @@
+streamlit
+gradio
+langchain
+langchain-community
+langchain-groq
+faiss-cpu
+pypdf
+python-dotenv
+tiktoken
+sentence-transformers
+reportlab
+groq
+numpy
